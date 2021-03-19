@@ -10,39 +10,29 @@ namespace API.Controllers
       [Route("api/[controller]")]
       public class StaffController : ControllerBase
       {
-            private readonly IStaffRepository _repository;
+            private readonly IStaffRepository _staffRepository;
             public StaffController(IStaffRepository repository)
             {
-                  _repository = repository;
-
+                  _staffRepository = repository;
             }
 
             [HttpGet]
             public async Task<ActionResult<IReadOnlyList<Staff>>> GetStaffAsync()
             {
-                  try
+                  var staff = await _staffRepository.GetStaffAsync();
+                  if (staff.Count < 0)
                   {
-                        var staff = await _repository.GetStaffAsync();
-                        return Ok(staff);
+                        return BadRequest("Unable to retrieve stuff members");
                   }
-                  catch
-                  {
-                        return BadRequest("Unable to retrieve staff.");
-                  }
+                  return Ok(staff);
             }
 
             [HttpGet("{staffId}")]
             public async Task<ActionResult<Staff>> GetStaffByIdAsync(int staffId)
             {
-                  try
-                  {
-                        var staff = await _repository.GetStaffByIdAsync(staffId);
-                        return Ok(staff);
-                  }
-                  catch
-                  {
-                        return BadRequest("Unable to find requested staff.");
-                  }
+                  var staff = await _staffRepository.GetStaffByIdAsync(staffId);
+                  if (staff == null) { return NotFound("Staff member not found."); }
+                  return Ok(staff);
             }
       }
 }

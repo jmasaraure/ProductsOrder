@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core.Contracts;
 using Core.Entities;
@@ -19,9 +20,10 @@ namespace Infrastructure.Data.Repositories
                   return await _context.Products.FindAsync(productId);
             }
 
-            public async Task<IReadOnlyList<Product>> GetProductsAsync()
+            public async Task<IList<Product>> GetProductsAsync()
             {
-                  return await _context.Products.ToListAsync();
+                  var result = await _context.Products.OrderBy(p => p.Title).ToListAsync();
+                  return result;
             }
       }
 }

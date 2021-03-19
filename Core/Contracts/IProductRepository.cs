@@ -7,6 +7,6 @@ namespace Core.Contracts
       public interface IProductRepository
       {
             Task<Product> GetProductByIdAsync(int productId);
-            Task<IReadOnlyList<Product>> GetProductsAsync();
+            Task<IList<Product>> GetProductsAsync();
       }
 }

@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using API.DTOs;
+using AutoMapper;
 using Core.Contracts;
-using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -17,31 +18,25 @@ namespace API.Controllers
             }
 
             [HttpGet]
-            public async Task<ActionResult<IReadOnlyList<Product>>> GetProductsAsync()
+            public async Task<ActionResult<IList<ProductDto>>> GetProductsAsync()
             {
-                  try
+                  var products = await _repository.GetProductsAsync();
+                  if (products.Count < 0)
                   {
-                        var products = await _repository.GetProductsAsync();
-                        return Ok(products);
+                        return BadRequest("Unable to retrieve products");
                   }
-                  catch
-                  {
-                        return BadRequest("Unable to retrieve products.");
-                  }
+                  return Ok(products);
             }
 
             [HttpGet("{productId}")]
-            public async Task<ActionResult<Product>> GetProductByIdAsync(int productId)
+            public async Task<ActionResult<ProductDto>> GetProductByIdAsync(int productId)
             {
-                  try
+                  var product = await _repository.GetProductByIdAsync(productId);
+                  if (product == null)
                   {
-                        var product = await _repository.GetProductByIdAsync(productId);
-                        return Ok(product);
+                        return NotFound("Unable to find specified product.");
                   }
-                  catch
-                  {
-                        return BadRequest("Unable to find requested product.");
-                  }
+                  return Ok(product);
             }
       }
 }

@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using AutoMapper;
+using API.Helpers;
 
 namespace API
 {
@@ -31,9 +33,20 @@ namespace API
                   //Configuring the connection string
                   services.AddDbContext<ProductsOrderDbContext>(x =>
                         x.UseSqlServer(_config.GetConnectionString("DefaultConnection")));
-                  //Injecting the interfaces
+
                   services.AddScoped<IProductRepository, ProductRepository>();
                   services.AddScoped<IStaffRepository, StaffRepository>();
+                  services.AddScoped(typeof(IRepository<>), (typeof(RepositoryBase<>)));
+                  services.AddAutoMapper(typeof(AutoMapperProfiles));
+                  services.AddCors(options =>
+                  {
+                        options.AddPolicy("MyCorsPolicy", policy =>
+                        {
+                              policy.AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .WithOrigins("*");
+                        });
+                  });
             }
 
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +62,8 @@ namespace API
                   app.UseHttpsRedirection();
 
                   app.UseRouting();
+
+                  app.UseCors("MyCorsPolicy");
 
                   app.UseAuthorization();
 
